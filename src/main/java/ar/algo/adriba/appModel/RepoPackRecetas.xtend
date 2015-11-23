@@ -1,25 +1,26 @@
-package ar.algo.adriba.recetas.controller
+package ar.algo.adriba.appModel
 
 import ar.algo.adriba.tp1.Comida
+import ar.algo.adriba.tp1.Fecha
 import ar.algo.adriba.tp1.Publica
 import ar.algo.adriba.tp1.Receta
 import ar.algo.adriba.tp1.RecetaBuilder
+import ar.algo.adriba.tp1.Rutina
+import ar.algo.adriba.tp1.Sexo
+import ar.algo.adriba.tp1.Usuario
+import ar.algo.adriba.tp1.UsuarioBuilder
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
-import org.uqbar.xtrest.api.Result
-import org.uqbar.xtrest.api.XTRest
-import org.uqbar.xtrest.api.annotation.Controller
-import org.uqbar.xtrest.api.annotation.Get
-import org.uqbar.xtrest.json.JSONUtils
 
-@Controller
 @Accessors
-class ControlerAndroid {
-	extension JSONUtils = new JSONUtils
+class RepoPackRecetas {
 
-	List<Receta> recetas = new ArrayList
-	int cont = 0
+	List<Receta> recetas = new ArrayList<Receta>
+	List<RecetaPack> packDeRecetas = new ArrayList<RecetaPack>
+	Usuario usuarioDefault
+	
+	
 
 	Comida carne = new Comida(0, "carne", 1)
 	Comida harina = new Comida(0, "Harina", 20)
@@ -43,7 +44,7 @@ class ControlerAndroid {
 
 
 	def void init() {
-			recetas => [
+		recetas => [
 			add(
 				new RecetaBuilder().tipoDeReceta(new Publica).nombreDelPlato("Milanesas").agregarIngrediente(harina).
 					agregarIngrediente(huevo).agregarIngrediente(aceite).setearTemporadas("Todo el año").
@@ -86,24 +87,22 @@ class ControlerAndroid {
 						"Cocinar la prepizza en el horno. Agregar el queso y volver a cocinar. Agregar la salsa blanca y la verdura").
 					setearNumeroId(6).build
 			)]
-		}
+	}
+
+	Fecha fechaValida = new Fecha(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
+	def crearUsuarioDefault() {
+		usuarioDefault = new UsuarioBuilder().agregarPeso(52).agregarAltura(1.64).agregarSexo(Sexo.FEMENINO).agregarNombre("Esteban").
+		agregarFechaNacimiento(fechaValida).agregarRutina(new Rutina(61, true)).build("1234")
+
+	}
+
+	def void crearPack() {
+		recetas.forEach[receta|packDeRecetas.add(new RecetaPack(receta,usuarioDefault))]
+	}
 	
-
-	def static void main(String[] args) {
-		XTRest.start(ControlerAndroid, 9000)
-		
-	}
-
-	@Get("/recetas")
-	def Result Recetas() {
-		
-		if(cont<1){
-		cont++
+	def void iniciar(){
 		this.init
-		}
-		
-		ok(recetas.toJson)
-
+		this.crearUsuarioDefault
+		this.crearPack
 	}
-
 }

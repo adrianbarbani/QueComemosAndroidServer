@@ -49,7 +49,7 @@ class RecetaBuilder {
 		
 	}
 	
-	def RecetaBuilder setearNumeroId (String id){
+	def RecetaBuilder setearNumeroId (long id){
 		receta.numeroId = id
 		this
 	}

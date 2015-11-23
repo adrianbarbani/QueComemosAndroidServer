@@ -1,5 +1,6 @@
 package ar.algo.adriba.tp1
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.ArrayList
 import java.util.List
@@ -11,13 +12,13 @@ import org.uqbar.commons.model.Entity
 public class Receta extends Entity implements Cosas  {
 
 	String nombreDelPlato
-	List<Cosas> subRecetaseIngredientes = new ArrayList<Cosas>
+	@JsonIgnore List<Cosas> subRecetaseIngredientes = new ArrayList<Cosas>
 	String explicacionDeLaPreparacion
 	int caloriasReceta
 	String dificultad
 	String temporada
-	TipoReceta tipo 
-	String numeroId
+	@JsonIgnore TipoReceta tipo 
+	long numeroId
 	
 	
 	new() {
@@ -154,10 +155,8 @@ public class Receta extends Entity implements Cosas  {
 		nombreDelPlato = string
 	}
 	
-	def String generarId(Receta unaReceta){  
-		var nuevoId = (Integer.parseInt(unaReceta.numeroId)) * 1000
-		var id = Integer.toString(nuevoId)
-		id
+	def long generarId(Receta unaReceta){  
+		unaReceta.numeroId * 1000
 		
 	}
 	
