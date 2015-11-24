@@ -90,7 +90,7 @@ class RecetasController {
 	}
 
 	//devuelve el app de los detalles receta, ingresar el id de la receta a buscar
-	def getDetalleRecetaAppModel(String body) {
+	def getDetalleRecetaAppModel(long body) {
 		var Busqueda busqueda = new Busqueda(usr)
 
 		var detalleReceta = new DetalleDeRecetaAppModel(busqueda.buscarPorId(body), usr)

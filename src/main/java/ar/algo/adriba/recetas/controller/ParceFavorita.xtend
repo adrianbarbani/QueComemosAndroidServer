@@ -4,6 +4,6 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 @Accessors
 class ParceFavorita {
-	String numeroId
+	long numeroId
 	boolean favorita
 }

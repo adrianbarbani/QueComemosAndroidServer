@@ -1,16 +1,26 @@
 package ar.algo.adriba.recetas.controller
 
+import ar.algo.adriba.appModel.DetalleDeRecetaAppModel
+import ar.algo.adriba.tp1.Busqueda
 import ar.algo.adriba.tp1.Comida
+import ar.algo.adriba.tp1.Fecha
 import ar.algo.adriba.tp1.Publica
 import ar.algo.adriba.tp1.Receta
 import ar.algo.adriba.tp1.RecetaBuilder
+import ar.algo.adriba.tp1.Rutina
+import ar.algo.adriba.tp1.Sexo
+import ar.algo.adriba.tp1.Usuario
+import ar.algo.adriba.tp1.UsuarioBuilder
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.uqbar.xtrest.api.Result
 import org.uqbar.xtrest.api.XTRest
+import org.uqbar.xtrest.api.annotation.Body
 import org.uqbar.xtrest.api.annotation.Controller
 import org.uqbar.xtrest.api.annotation.Get
+import org.uqbar.xtrest.api.annotation.Post
+import org.uqbar.xtrest.http.ContentType
 import org.uqbar.xtrest.json.JSONUtils
 
 @Controller
@@ -18,8 +28,12 @@ import org.uqbar.xtrest.json.JSONUtils
 class ControlerAndroid {
 	extension JSONUtils = new JSONUtils
 
+	Fecha fechaValida = new Fecha(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
+
 	List<Receta> recetas = new ArrayList
 	int cont = 0
+	Usuario usr = new UsuarioBuilder().agregarPeso(52).agregarAltura(1.64).agregarSexo(Sexo.FEMENINO).
+		agregarNombre("Esteban").agregarFechaNacimiento(fechaValida).agregarRutina(new Rutina(61, true)).build("1234")
 
 	Comida carne = new Comida(0, "carne", 1)
 	Comida harina = new Comida(0, "Harina", 20)
@@ -40,10 +54,8 @@ class ControlerAndroid {
 	Comida oregano = new Comida(100, "Oregano", 0)
 	Comida azucar = new Comida(0, "azucar", 200)
 
-
-
 	def void init() {
-			recetas => [
+		recetas => [
 			add(
 				new RecetaBuilder().tipoDeReceta(new Publica).nombreDelPlato("Milanesas").agregarIngrediente(harina).
 					agregarIngrediente(huevo).agregarIngrediente(aceite).setearTemporadas("Todo el año").
@@ -86,24 +98,41 @@ class ControlerAndroid {
 						"Cocinar la prepizza en el horno. Agregar el queso y volver a cocinar. Agregar la salsa blanca y la verdura").
 					setearNumeroId(6).build
 			)]
-		}
-	
+	}
 
 	def static void main(String[] args) {
 		XTRest.start(ControlerAndroid, 9000)
-		
+
 	}
 
 	@Get("/recetas")
 	def Result Recetas() {
-		
-		if(cont<1){
-		cont++
-		this.init
+
+		if (cont < 1) {
+			cont++
+			this.init
 		}
-		
+
 		ok(recetas.toJson)
 
+	}
+
+	@Post("/favorita/:favorita:numeroid")
+	def Result hacerFavorita(@Body String body) {
+		var ParceFavorita aux = body.fromJson(ParceFavorita)
+		var detalleApp = this.getDetalleRecetaAppModel(aux.numeroId)
+
+		detalleApp.setFavorita(aux.favorita) // ver esto por que no siempre es un true.
+
+		response.contentType = ContentType.TEXT_PLAIN
+		ok('{ "status" : "OK" }')
+
+	}
+
+	def getDetalleRecetaAppModel(long body) {
+		var Busqueda busqueda = new Busqueda(usr)
+
+		new DetalleDeRecetaAppModel(busqueda.buscarPorId(body), usr)
 	}
 
 }

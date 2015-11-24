@@ -104,12 +104,12 @@ class Busqueda {
 		receta.get(0)
 	}
 	
-	def Receta buscarPorId(String id){
+	def Receta buscarPorId(long id){
 		var receta = this.listaPorId(id)
 		receta.get(0)	
 	}
 	
-	def listaPorId(String id){
+	def listaPorId(long id){
 		pasarPorFiltros(this.recetasQuePuedeVer.filter[receta|
 			this.match(id, receta.numeroId)].toList)
 	}
